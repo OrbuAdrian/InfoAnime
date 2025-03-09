@@ -7,108 +7,183 @@ async function searchMoe(files){
     const formData = new FormData();
     formData.append("image", file); 
 
-    let proxyServer = new XMLHttpRequest();
-    let xhr = new XMLHttpRequest();
+    await fetch("https://api.trace.moe/search", {
+        method: "POST",
+        body: formData,
+    }).then(async (response) => {
+        if (response.ok) {
+            const parsedResult = await response.json();
+            console.log(JSON.stringify(parsedResult, null, 2));
 
-    xhr.open("POST", "https://api.trace.moe/search", true);
-    xhr.send(formData);
-    
-    xhr.onloadstart = function() {
-        console.log("searchMoe called");
-    }
+            if (parsedResult?.result?.length > 0) {
 
-    imageList = [];
-    xhr.onload = async function () {
-        if (xhr.status === 200 && xhr.readyState === 4) {
-            try {
-                const parsedResult = JSON.parse(xhr.responseText);
-                console.log(JSON.stringify(parsedResult, null, 2));
+                fetchImages(parsedResult);
 
-                if (parsedResult?.result?.length > 0) {
-
-                    parsedResult.result.map(async (item, index) => {
-                        console.log(item.image);
-                        imageList.push(item.image);
-                    
-                    });
-
-                } else {
-                    console.log("No results found.");
-                }
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
+            } else {
+                console.log("No results found.");
             }
         } else {
-            console.error("Request failed with status:", xhr.status);
+            console.error("Request failed with status:", response.status);
         }
-    };
+    })
 
-
-    xhr.onloadend = function() {
-        console.log("searchMoe finished");
-
-        console.table(imageList);
-        appendImages(imageList);
-    }
-
-
-    xhr.onerror = function () {
-        console.log(xhr.status);
-        console.log(xhr.statusText);
-    };
-
+    
 }
 
-async function downloadImageToBuffer(imageUrl) {
-    console.log("downloadImageToBuffer called");
+
+async function fetchImages(results) {
+    console.log("fetchImages called");
+
+    animeFilter = filterResultsByAnime(results);
+    finalResults = filterResultsBySimilarity(animeFilter);
+    console.log(finalResults);
+
+    await appendImages(finalResults);
+
+    
+
+    const queryCards = document.getElementsByClassName('responseCard');
+    console.log("queryCards after append:", queryCards);
+    console.log("Length after append:", queryCards.length);
+
+    for (let card of queryCards) {
+        card.addEventListener('click', () => {
+            console.log("Card clicked:", card.dataset.anilist);
+
+            var query = `
+            query ($id: Int){
+                Media(id: $id, type: ANIME) {
+                    title{
+                        romaji
+                        english
+                        native
+                    }
+                    synonyms 
+
+                    coverImage {
+                        large
+                    }
+
+                    bannerImage
+
+                    description
+
+                    format
+
+                    status
+
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+
+                    season
+
+                    episodes
+    
+                    duration
+    
+                    genres
+    
+                    studios {
+                        nodes {
+                            name
+                            siteUrl
+                            isAnimationStudio
+
+                        }
+                        
+                    }
+
+                    averageScore
+
+                    popularity
+
+                    trending
+
+                    tags {
+                        name
+                    }
 
 
-    try {
-        const response = await fetch(`http://localhost:3000/uploadImage?url=${encodeURIComponent(imageUrl)}`);
-        if (!response.ok) throw new Error("Failed to fetch image");
 
-        const blob = await response.blob();
+                    characters{
+                        edges {
+                            role
+                            node {
+                                id
+                                name {
+                                    full
+                                }
+                                image {
+                                    large
+                                }
+                            }
+                        }
+                    }
 
-        // Convert the Blob to a data URL
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = e => resolve(e.srcElement.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
+                    staff {
+                        edges {
+                            role
+                            node {
+                                name {
+                                    full
+                                }
+                                image {
+                                    large
+                                    medium    
+                                }
+                            }
+                        }
+                    }
+                }
+            }`
+            ;
+
+            var variables = {
+                id: `${card.dataset.anilist}`,
+                perPage: 50
+            };
+
+
+            var url = 'https://graphql.anilist.co',
+                options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        variables: variables
+                    })
+                };
+
+            fetch(url, options).then(handleResponse)
+                .then(handleData)
+                .catch(handleError);
         });
-
     }
-    catch (error) { 
-        console.error("Error fetching image:", error);
-        return null;
-    }
-    
 }
 
-async function appendImages(imageUrls) {
-    console.log("Image appending initiating...");
-    const cards = document.querySelectorAll('.exampleCard');
+function handleResponse(response) {
+    return response.json().then(function (json) {
+        return response.ok ? json : Promise.reject(json);
+    });
+}
 
-    if (imageUrls.length > cards.length) {
-        console.log("More images then cards.");
+function handleData(data) {
+    console.log(data);
+}
 
-        for (let i = 0; i < imageUrls.length; i++) {
-            const card = cards[i];
-            const imageUrl = imageUrls[i];
-    
-            try {
-                const dataUrl = await downloadImageToBuffer(imageUrl); 
-
-                card.style.backgroundImage = `url(${dataUrl})`; 
-    
-            } catch (error) {
-                console.error(`Error processing image ${i}:`, error);
-            }
-        }
-
-    }else if (imageUrls.length < cards.length) {
-        console.log("More cards then images.");
-        return 0;
-    }
-
+function handleError(error) {
+    alert('Error, check console');
+    console.error(error);
 }
