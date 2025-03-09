@@ -1,0 +1,30 @@
+.searchColumn{
+    margin:0 2rem 0 2rem;
+    width: var(--searchWindowWidth);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+}
+
+.searchBar{
+    padding: 2px 15px 2px 15px;
+    font-size: 1.2rem;
+    font-weight: 300;
+    cursor: pointer;
+    
+    border: 1.5px solid rgba(255, 255, 255, 0.65);
+    border-radius: 8px;
+
+    background-color: rgba(var(--bg-color), 0.65);
+    color: rgb(255, 255, 255);
+    transition: all 0.4s ease-in-out;
+}
+
+.searchBar:hover{
+    border: 1.5px solid rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.15);   
+}

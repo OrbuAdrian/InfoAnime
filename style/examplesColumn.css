@@ -1,0 +1,31 @@
+.examplesColumn{
+  -webkit-user-select: none;
+  user-select: none;
+
+  width: var(--examplesWindowWidth);
+  height: 100vh; /* Ensure column takes full viewport height */
+  background-color: black;
+  overflow: hidden;
+  position: relative;
+        
+}
+
+.examplesColumn:hover .exampleCardLine{
+    animation-play-state: paused;
+}
+
+.exampleCardLine{
+ 
+    height: var(--cardLineHeight);
+    position: absolute;
+    width: 100%;
+    top: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    animation: scrollAnimation var(--exampleCardAnimationDuration) linear infinite;
+    transition: all 0.3s;
+}
+
