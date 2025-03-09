@@ -12,6 +12,7 @@
       <link rel="stylesheet" href="../style/searchColumn.css">
       <link rel="stylesheet" href="../style/examplesColumn.css">
       <link rel="stylesheet" href="../style/exampleCard.css">
+      <link rel="stylesheet" href="../style/responseCard.css">
 
 
     </head>
@@ -22,8 +23,11 @@
 
         <div class="searchColumn">
           
+          <input type="text" id="search" placeholder="Search for an anime">
+
           <input type="file" id="searchBar" onchange="searchMoe(this.files)" placeholder="Upload an image">
           <label for="searchBar" class="searchBar">Choose an image</label>
+
 
         </div>
       
@@ -62,6 +66,6 @@
       <script src="script.js"></script>
       <script src="slideAnimation.js"></script>
       <script src="transformAnimation.js"></script>
-      
+      <script src="filterResults.js"></script>
     </body>
   </html>

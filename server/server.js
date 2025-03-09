@@ -16,17 +16,10 @@ app.use(cors({
 app.options('*', cors());
 
 const PORT = 3000;
-const UPLOAD_DIR = path.join(__dirname, 'uploads');
-const LOGS_DIR = path.join(__dirname, 'logs');
-
 
 
 app.get('/uploadImage', async (req, res) => {
-    console.log("uploadImage called");
-
     const imageUrl = req.query.url;
-
-    console.log("imageUrl:", imageUrl);
 
     if(!imageUrl){
         return res.status(400).send('No image URL provided');
@@ -34,16 +27,11 @@ app.get('/uploadImage', async (req, res) => {
 
 
     try {
-        // Download the image using axios
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
 
-        // Create a Buffer from the image data
         const buffer = Buffer.from(response.data, 'binary');
-
-        // Set the Content-Type header
         res.set('Content-Type', response.headers['content-type']);
 
-        // Send the Buffer as the response
         res.send(buffer);
 
     } catch (error) {
@@ -52,14 +40,6 @@ app.get('/uploadImage', async (req, res) => {
     }
 });
 
-app.get("/logs", async (req, res) => {
-    const text = req.query.txt || "No data received"; // Default if txt is missing
-    console.log("Received:", text);
-
-    res.json({ message: text }); // Send a JSON response
-});
-
-app.use("/uploads", express.static(UPLOAD_DIR));
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);

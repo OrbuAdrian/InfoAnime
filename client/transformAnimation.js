@@ -99,25 +99,6 @@
         console.log(index, scaleFactor, translateFactor);
         });
 
-        // const count = nextCards.length;
-        // //const scaleFactor = (count > 1 ? 1.5 / count : 0.5); 
-        // const scaleFactor = (count > 1 ? (count + 1) / 2 : 1.5);
-        // const translateFactor = (count - 1) * 17;
-        // console.log(count, translateFactor)
-
-        // card.style.scale = `${(scaleFactor)} 1`;
-        // card.style.transform = `translateX(${(translateFactor)}%)`;
-        
-        // nextCards.forEach((nextCard, index) => {
-        //     //const translateFactor = (count * 25) - (index - 1) * (100/(count + 1));
-        //     const translateFactor = 50 - (index) * 32.5;
-        //     //console.log(translateFactor);
-            
-        //     nextCard.style.scale = `${(scaleFactor)} 1`;
-        //     nextCard.style.transform = `translateX(${(translateFactor)}%)`;
-        //     //console.log(index, scaleFactor, translateFactor);
-        // });
-
 
     }else if (hasPrevious && !hasNext){
         const count = previousCards.length;
