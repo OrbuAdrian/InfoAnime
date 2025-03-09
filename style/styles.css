@@ -1,29 +1,31 @@
-body {
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+:root {
+    --bg-color: rgb(25, 25, 25);
+    --cardLineHeight: 40%;
+    --exampleCardAnimationDuration: 15s;
+    --examplesWindowWidth: 60%;
+    --searchWindowWidth: calc(100% - var(--examplesWindowWidth));
+    
+}
+
+body {
+    background-color: var(--bg-color);
+    
+}
 
 input[type="file"] {
     display: none;
 }
 
-label.searchBar{
-    padding: 2px 15px 2px 15px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    
-    border: 3px solid rgb(40, 40, 40);
-    border-style: dashed;
-    border-radius: 8px;
-    box-shadow: inset 0 0 10px 5px rgba(83, 83, 83, 0.3);
+.container {
+    height: 100vh;
+    width: 100vw;
 
-    background-color: rgba(245, 245, 245, 0.4);
-    color: rgb(23, 23, 23);
-    transition: all 0.3s;
-}
-
-label.searchBar:hover{
-    box-shadow: inset 0 0 10px 5px rgba(83, 83, 83, 0.5),
-                      0 0 10px 5px rgba(255, 255, 255, 0.7);   
+    display: flex;
+    justify-content: space-between;
 }
