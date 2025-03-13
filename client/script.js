@@ -3,48 +3,121 @@ async function searchMoe(files){
     console.log("searchMoe called");
     if (!files.length) return; 
 
+    let traceMoeData;
+
     const file = files[0]; 
     const formData = new FormData();
     formData.append("image", file); 
 
-    await fetch("https://api.trace.moe/search", {
-        method: "POST",
-        body: formData,
-    }).then(async (response) => {
-        if (response.ok) {
-            const parsedResult = await response.json();
-            console.log(JSON.stringify(parsedResult, null, 2));
 
-            if (parsedResult?.result?.length > 0) {
+    var url = 'https://api.trace.moe/search',
+        options = {
+            method: 'POST',
+            body: formData
+        };
 
-                fetchImages(parsedResult);
+    await fetch(url, options)
+        .then(handleResponse)
+        .then(data => {
 
-            } else {
-                console.log("No results found.");
+                console.log(data);
+                traceMoeData = data;
             }
-        } else {
-            console.error("Request failed with status:", response.status);
-        }
-    })
+        )
+        .catch(handleError);
 
-    
+    console.log("searchMoe finished");
+    return traceMoeData;
 }
 
+async function searchAnilist(query = null, variables = null) {
 
-async function fetchImages(results) {
-    console.log("fetchImages called");
-
-    animeFilter = filterResultsByAnime(results);
-    finalResults = filterResultsBySimilarity(animeFilter);
-    console.log(finalResults);
-
-    await appendImages(finalResults);
+    console.log("searchAnilist called");
+    let anilistData;
 
     
 
+    if (query === null && variables === null) {
+        query = `query {
+                    Page(page: 1, perPage: 50) {
+                        media(type: ANIME, sort: POPULARITY_DESC) {
+                            id
+                            title {
+                                romaji
+                                english
+                                native
+                            }
+                            coverImage {
+                                large
+                            }
+                            averageScore
+                            popularity
+                        }
+                    }
+                }`;
+    }else if (query === null && variables != null) {
+        query = `query($searchTerm: String, $searchType: MediaType, $sortType: [MediaSort]) {
+            Page(page: 1, perPage: 50) {
+                media(search: $searchTerm, type: $searchType, sort: $sortType) {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                    }
+                    coverImage {
+                        large
+                    }
+                    averageScore
+                    popularity
+                }
+            }
+        }`;
+
+        
+        variables = {
+            searchTerm: variables.searchTerm,
+            searchType: variables.searchType === undefined ? "ANIME" : variables.searchType, 
+            sortType: variables.sortType === undefined ? "POPULARITY_DESC" : variables.sortType,
+        };
+        
+    }
+
+
+
+    var url = 'https://graphql.anilist.co',
+        options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                query: query,
+                variables: variables
+            })
+        };
+
+    await fetch(url, options)
+        .then(handleResponse)
+        .then(data => {
+                console.log(data);
+                anilistData = data;
+            }
+        )
+        .catch(handleError);
+        
+        console.log("searchAnilist finished");
+        
+    return anilistData;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+});
+
+async function getAnilistResponse() {
     const queryCards = document.getElementsByClassName('responseCard');
-    console.log("queryCards after append:", queryCards);
-    console.log("Length after append:", queryCards.length);
 
     for (let card of queryCards) {
         card.addEventListener('click', () => {
@@ -154,23 +227,45 @@ async function fetchImages(results) {
 
 
             var url = 'https://graphql.anilist.co',
-                options = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        variables: variables
-                    })
-                };
+            options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    variables: variables
+                })
+            };
 
             fetch(url, options).then(handleResponse)
-                .then(handleData)
+                .then(data => {return data})
                 .catch(handleError);
         });
     }
+
+}
+
+async function fetchImages(results, api = "traceMoe") {
+    console.log("fetchImages called");
+
+
+    if (api === "traceMoe") {
+        console.log("Using trace.moe API");
+        animeFilter = filterResultsByAnime(results);
+        //finalResults = filterResultsBySimilarity(animeFilter);
+        console.log(animeFilter);
+
+        //await appendImages(finalResults);
+    } else if (api === "anilist") {
+        console.log("Using Anilist API");
+        const finalResults = getAnilistResponse();
+        console.log(finalResults);
+
+        //await appendImages(finalResults);
+    }
+    
 }
 
 function handleResponse(response) {
@@ -187,3 +282,47 @@ function handleError(error) {
     alert('Error, check console');
     console.error(error);
 }
+
+const search = document.getElementById('search');
+    search.addEventListener('keyup', function(event){
+        if (event.key === 'Enter') {
+            console.log(search.value);
+
+
+            var query = `
+            query ($search: String){
+                Page(page: 1, perPage: 10) {
+                    pageInfo { 
+                        total
+                        currentPage
+                        lastPage
+                        hasNextPage
+                        perPage
+                    }
+
+                    media(search: $search, type: ANIME) {
+                        id
+                        title{
+                            romaji
+                            english
+                            native
+                        }
+                        coverImage {
+                            large
+                            medium
+                        }
+                        bannerImage
+                    }
+                }
+            }`
+            ;
+
+            var variables = {
+                search: search.value,
+            }
+            ;
+
+
+            searchAnilist(query, variables);
+        }
+    });
