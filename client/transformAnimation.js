@@ -1,3 +1,8 @@
+    
+    function transformCards() {
+
+
+
     let visibleCardLines = [];
 
     let previousCardLines = [];
@@ -9,7 +14,7 @@
     function checkVisibleCardLines(){
     const container = document.querySelector('.examplesColumn');
 
-    const cardLines = document.querySelectorAll('.exampleCardLine');
+    const cardLines = document.querySelectorAll('.cardLine');
 
     cardLines.forEach(cardLine => {
     const containerRect = container.getBoundingClientRect();
@@ -29,7 +34,7 @@
 
     }
 
-    const cards = document.querySelectorAll('.exampleCard');
+    const cards = document.querySelectorAll('.responseCard');
     cards.forEach(card => {
     let previousCard = null, nextCard = null;
     let hasPrevious = false, hasNext = false;
@@ -140,7 +145,7 @@
     })
     });
 
-    const cardLines = document.querySelectorAll('.exampleCardLine');
+    const cardLines = document.querySelectorAll('.cardLine');
 
     cardLines.forEach(cardLine => {
     cardLine.addEventListener('mouseover', () => {
@@ -213,3 +218,5 @@
 
 
     });
+
+}

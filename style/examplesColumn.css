@@ -10,11 +10,11 @@
         
 }
 
-.examplesColumn:hover .exampleCardLine{
+.examplesColumn:hover .cardLine{
     animation-play-state: paused;
 }
 
-.exampleCardLine{
+.cardLine{
  
     height: var(--cardLineHeight);
     position: absolute;

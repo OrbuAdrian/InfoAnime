@@ -6,8 +6,8 @@
 /* card line height 40 */
 :root {
     --bg-color: rgb(25, 25, 25);
-    --cardLineHeight: 40%;
-    --exampleCardAnimationDuration: 15s;
+    --cardLineHeight: 33.33%;
+    --exampleCardAnimationDuration: 105s;
 
     --examplesWindowWidth: 70%;
     --searchWindowWidth: calc(100% - var(--examplesWindowWidth));

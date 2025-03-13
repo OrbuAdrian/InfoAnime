@@ -1,10 +1,15 @@
+function runSlideAnimation(){
+
+
+
 let rootStyle = getComputedStyle(document.documentElement);
 
 let duration = rootStyle.getPropertyValue('--exampleCardAnimationDuration').trim();
 let exCardHeight = rootStyle.getPropertyValue('--cardLineHeight');
 
 let exampleColumn = document.querySelector('.examplesColumn');
-let exCardLines = document.querySelectorAll('.exampleCardLine');
+let exCardLines = document.querySelectorAll('.cardLine');
+
 
 let count = exampleColumn.children.length;
 
@@ -28,3 +33,4 @@ exCardLines.forEach((exCardLine, index) => {
     let delay = duration * (index / count);
     exCardLine.style.animationDelay = `${-delay}s`;
 });
+}

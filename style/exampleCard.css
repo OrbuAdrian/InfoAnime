@@ -9,7 +9,6 @@
 }
 
 .exampleCard {
-    width: 100%;
     height: 100%;
 
     margin: 0 3px;
@@ -49,7 +48,7 @@
 
 .exampleCard::after{
     content: var(--card-text);
-    font-size: var(--card-text-size);
+    font-size: 0;
     color: rgb(200, 200, 200);
     
     transition: color 0.125s;
@@ -60,56 +59,3 @@
     color: rgba(255, 255, 255, 1);
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 1));
 }
-
-
-#card1 { 
-    background-image: url("/resources/Attack\ on\ Titan.png"); 
-    --card-text: "Attack on Titan";
-    --card-text-size: 20cqw;
-}
-    
-#card2 {
-    background-image: url("/resources/Death\ Note.png"); 
-    --card-text: "Death Note";
-    --card-text-size: 34cqw;
-}
-
-#card3 {
-    background-image: url("/resources/One\ Punch\ Man.png");
-    --card-text: "One Punch Man";
-    --card-text-size: 30cqw;
-}
-
-#card4 {
-    background-image: url("/resources/My\ Hero\ Academia.png");
-    --card-text: "My Hero Academia";
-    --card-text-size: 35cqw;
-}
-
-#card5 {
-    background-image: url("/resources/Demon\ Slayer\ Kimetsu\ no\ Yaiba.png");
-    --card-text: "Demon Slayer: Kimetsu no Yaiba";
-    --card-text-size: 24cqw;
-}
-
-#card6 {
-    background-image: url("/resources/Hunter\ x\ Hunter.png");
-    --card-text: "Hunter x Hunter";
-    --card-text-size: 20cqw;
-}
-
-#card7 {
-    background-image: url("/resources/Jujutsu\ Kaisen.png");
-    --card-text: "Jujutsu Kaisen";
-    --card-text-size: 20cqw;
-}
-
-#card8 {
-    background-image: url("/resources/Tokyo\ Ghoul.png");
-    --card-text: "Tokyo Ghoul";
-    --card-text-size: 25cqw;
-}
-
-
-
-
