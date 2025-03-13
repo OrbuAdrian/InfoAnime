@@ -1,76 +1,3 @@
-async function appendImages(results) {
-    
-    const maxResults = 10; // Set the maximum number of results to display
-    const nrOfResults = Math.min(results.result.length, maxResults);
-
-    const responseWindow = document.querySelector('.examplesColumn');
-    const parentHeight = responseWindow.offsetHeight;
-    responseWindow.innerHTML = '';
-
-    
-    let cardCounter = 0;
-
-
-    if (nrOfResults >= 6) {
-        
-        for (let i = 0; i < 3; i++) {
-            const exCardHeight = parentHeight / 3;
-            const cardLine = document.createElement('div');
-            cardLine.classList.add('exampleCardLine');
-            cardLine.style.height = `${exCardHeight}px`;
-            cardLine.style.animation = 'none';
-            
-            
-            
-            for (let j = 0; j < i + 1; j++) {
-                const exampleCard = document.createElement('div');
-                exampleCard.classList.add('responseCard');
-                exampleCard.dataset.anilist = results.result[cardCounter].anilist;
-
-                dataUrl = await downloadImageToBuffer(results.result[cardCounter].image);
-                exampleCard.style.backgroundImage = `url(${dataUrl})`; 
-                
-
-                startPosition = (j * exCardHeight);
-                cardLine.style.top = `${startPosition}px`;
-                
-                cardCounter++;
-                cardLine.appendChild(exampleCard);
-            }
-
-            responseWindow.appendChild(cardLine);
-        }
-    } 
-    else if (nrOfResults >= 3){
-        for (let i = 0; i < 2; i++) {
-            const exCardHeight = parentHeight / 2;
-            const cardLine = document.createElement('div');
-            cardLine.classList.add('exampleCardLine');
-            cardLine.style.height = `${exCardHeight}px`;
-            cardLine.style.animation = 'none';
-            
-            
-            
-            for (let j = 0; j < i + 1; j++) {
-                const exampleCard = document.createElement('div');
-                exampleCard.classList.add('responseCard');
-
-                dataUrl = await downloadImageToBuffer(results.result[cardCounter].image);
-                exampleCard.style.backgroundImage = `url(${dataUrl})`; 
-                
-
-                startPosition = (j * exCardHeight);
-                cardLine.style.top = `${startPosition}px`;
-                
-                cardCounter++;
-                cardLine.appendChild(exampleCard);
-            }
-
-            responseWindow.appendChild(cardLine);
-        }
-    }
-}
-
 function filterResultsByAnime(results) {
     console.log("filterResultsByAnime called");
 
@@ -119,8 +46,10 @@ async function downloadImageToBuffer(imageUrl) {
         const response = await fetch(`http://localhost:3000/uploadImage?url=${encodeURIComponent(imageUrl)}`);
         if (!response.ok) throw new Error("Failed to fetch image");
 
+        
         const blob = await response.blob();
-
+    
+        
         // Convert the Blob to a data URL
         return new Promise((resolve, reject) => {
             const reader = new FileReader();

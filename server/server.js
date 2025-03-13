@@ -1,8 +1,5 @@
 const express = require('express');
 const cors = require("cors");
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
 
 const app = express();
 app.use(express.json());
@@ -27,16 +24,15 @@ app.get('/uploadImage', async (req, res) => {
 
 
     try {
-        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-
-        const buffer = Buffer.from(response.data, 'binary');
-        res.set('Content-Type', response.headers['content-type']);
-
-        res.send(buffer);
-
-    } catch (error) {
-        console.error("Error proxying image:", error);
-        res.status(500).send("Error proxying image");
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        return arrayBuffer; // Return the ArrayBuffer directly
+      } catch (error) {
+        console.error("Error fetching image:", error);
+        return null;
     }
 });
 
