@@ -1,117 +1,114 @@
+import { create_searchLabel, create_searchInput, create_fileInput, create_searchWindow } from "./search_window/searchWindow.js"; 
+import { run_slideAnimation, run_transformCardsAnimation, create_displayWindow, create_displayTypeSettings} from "./display_window/displayWindow.js";
 
-let traceMoeData, anilistData;
-apiData = {};
-let query, variables;
+window.traceMoeData, window.anilistData;
+let apiData = {};
+let query;
+window.variables;
 let container
+window.isCharacterData = false;
 
-let anilistFunc, traceMoeFunc;
+window.anilistBool = true;
+window.traceMoeBool = false;
+let searchWindow, fileInput, searchInput, searchLabel, exWindow, apiDataLength, img;
+
+window.appSettings = {
+    activeQueryType: "ANIME" // Default query type
+};
+
+let inputFiles;
+
 
 document.addEventListener('DOMContentLoaded', async () => {
      
     container = document.createElement("div");
     container.className = "container";
 
-    searchWindow = document.createElement("div");
-    searchWindow.className = "searchColumn";
+    searchWindow = create_searchWindow();
+    exWindow = create_displayWindow();
     
-    loadSearchWindow();
-    await loadPreviewWindow();
-
-    document.body.appendChild(container);
-
-    runSlideAnimation();
-    transformCards();
-});
-
-function loadSearchWindow(){
-
-    let searchInput = document.createElement("input");
-    let fileInput = document.createElement("input");
-    let searchLabel = document.createElement("label");
-
-    searchInput.type = "text";
-    searchInput.id = "search";
-    searchInput.placeholder = "Search for anime";
-
-
-    searchInput.addEventListener("keyup", async (event) => {
-        if (event.key === "Enter") {
-
-            exWindow = document.querySelector(".examplesColumn");
-            container.removeChild(exWindow);
-
-            console.log(searchInput.value);
-            variables = { searchTerm: searchInput.value, searchType: "ANIME" };
-
-            anilistFunc = true;
-            traceMoeFunc = false;
-
-            await loadPreviewWindow();
-
-            document.body.appendChild(container);
-
-            runSlideAnimation();
-            transformCards();
+    searchLabel = create_searchLabel((callback) => {
+        if (callback) {
+            fileInput.click();
+        }
+    });
+    fileInput = create_fileInput((files) => {
+        if (files && files.length > 0) {
+            inputFiles = files;
+            window.appSettings.activeQueryType = null;
+            loadMainPage();
+        }
+    });
+    searchInput = create_searchInput((callback) => {
+        if (callback) {
+            loadMainPage();
         }
     });
 
+    loadMainPage();
+});
 
+async function loadMainPage() {
+
+    container.innerHTML = '';
+    exWindow.innerHTML = '';
+
+
+    loadSearchWindow();
+    await loadPreviewWindow();
     
-    fileInput.type = "file";
-    fileInput.id = "searchBar";
-    fileInput.accept = "image/*";
-    fileInput.placeholder = "Upload an image";
+    document.body.appendChild(container);
 
+    run_slideAnimation();
+    run_transformCardsAnimation();
+};
 
-    fileInput.addEventListener("change", async (files) => {
-        exWindow = document.querySelector(".examplesColumn");
-        container.removeChild(exWindow);
+function loadSearchWindow(){
 
-        traceMoeFunc = true;
-        anilistFunc = false;
+    let screen = document.createElement("div");
 
-        traceMoeData = await searchMoe(files.target.files);
-        await loadPreviewWindow();
+    screen.appendChild(searchInput);
+    screen.appendChild(fileInput);
+    screen.appendChild(searchLabel);
 
-        document.body.appendChild(container);
-
-        runSlideAnimation();
-        transformCards();
-    });
-    
-    searchLabel.for = "searchBar";
-    searchLabel.className = "searchBar";
-    searchLabel.innerHTML = "Choose an image";
-    searchLabel.addEventListener("click", () => {
-        fileInput.click();
-    });
-
-    searchWindow.appendChild(searchInput);
-    searchWindow.appendChild(fileInput);
-    searchWindow.appendChild(searchLabel);
-
+    searchWindow.appendChild(screen);
     container.appendChild(searchWindow);
-
+    
 }
 
 async function loadPreviewWindow(){
     apiData = {};
 
-    exWindow = document.createElement("div");
-    exWindow.className = "examplesColumn";
-
     const cardLines = [];
 
-    if (traceMoeFunc) {
+    let cardsTypeSettings = create_displayTypeSettings(searchInput, (wasClicked) => {
+        if (wasClicked) {
+            console.log("Was clicked");
 
-        filteredAnime = filterResultsByAnime(traceMoeData);
-        traceMoeData = filterResultsBySimilarity(filteredAnime);
+            loadMainPage();
+        }
+    });
 
-        await Promise.all(traceMoeData.result.map(async (element, index) => {
+    let cardsWindow = document.createElement("div");
+    cardsWindow.className = "examplesColumn";
+    
+
+    console.log("Trace moe bool is ", window.traceMoeBool);
+    console.log("Anilist bool is ", window.anilistBool);
+
+    if (window.traceMoeBool) {
+        
+        window.traceMoeData = await searchTraceMoe(inputFiles);
+
+        let filteredAnime = filterResultsByAnime(window.traceMoeData);
+        window.traceMoeData = filterResultsBySimilarity(filteredAnime);
+
+        await Promise.all(window.traceMoeData.result.map(async (element, index) => {
             try {
                 // Use imageUrlToArrayBuffer instead of downloadImageToBuffer
                 const image = await downloadImageToBuffer(element.image);
-                
+                console.log(image);
+
                 apiData[index] = {
                     id: element.anilist,
                     img: image,
@@ -121,15 +118,13 @@ async function loadPreviewWindow(){
                     to: element.to
                 };
                 
-                console.log(apiData[index]);
             } catch (error) {
                 console.error(`Error processing image ${index}:`, error);
             }
         }));
 
-        let cardCounter = 0;
-    
 
+        let cardCounter = 0;    
         for (let i = 0; i < 3; i++) {
 
             let cardLine = document.createElement("div");
@@ -138,60 +133,75 @@ async function loadPreviewWindow(){
             cardLine.style.animation = 'none';  
             cardLine.style.top = `${i * 33.33}%`;
             
-            exWindow.appendChild(cardLine);
             
             for (let j = 0; j < i + 1; j++) { 
                 let exCard = document.createElement("div"); 
                 exCard.className = "responseCard";
+                
 
-
-                img = apiData[cardCounter].img; 
-                exCard.style.backgroundImage = `url(${img})`;
-
+                let image = apiData[cardCounter].img; 
+                exCard.style.backgroundImage = `url(${image})`;
+                
                 exCard.dataset.id = apiData[cardCounter].id;
                 exCard.dataset.similarity = apiData[cardCounter].similarity;
                 exCard.dataset.episode = apiData[cardCounter].episode;
                 exCard.dataset.from = apiData[cardCounter].from;
                 exCard.dataset.to = apiData[cardCounter].to;
-
-
+                
+                
                 cardLine.appendChild(exCard);
                 cardCounter++; 
-              }
-
+            }
+            
+            cardLines.push(cardLine);
         }
 
         
-    } else if (anilistFunc || !traceMoeFunc) {
+    } else if (window.anilistBool) {
 
-        anilistData = await searchAnilist(null, variables);
+        window.anilistData = await searchAnilist(null, window.variables);
+        
+        if (!window.isCharacterData) {
+            
+            window.anilistData = window.anilistData.data.Page.media.filter(media => !media.isAdult);
+            console.log(window.anilistData);
+            window.anilistData.forEach((element, index) => {
+                apiData[index] = {};
 
+                apiData[index] = {
+                    id: element.id,
+                    title: {
+                        english: element.title.english,
+                        romaji: element.title.romaji,
+                        native: element.title.native,
+                    },
+                    img: element.coverImage.large,
+                    avgScore: element.averageScore,
+                    popularity: element.popularity,
+                    link: element.siteUrl
+                };
+            
+            });
+        } else {
+            
+            window.anilistData.data.Page.characters.forEach((element, index) => {
+                apiData[index] = {};
 
-        anilistData.data.Page.media.forEach((element, index) => {
-            apiData[index] = {};
+                apiData[index] = {
+                    id: element.id,
+                    name: element.name.full,
+                    img: element.image.large
+                };
+            
+            });
+ 
+        }
 
-            apiData[index] = {
-                id: element.id,
-                title: {
-                    english: element.title.english,
-                    romaji: element.title.romaji,
-                    native: element.title.native,
-                },
-                img: element.coverImage.large,
-                avgScore: element.averageScore,
-                popularity: element.popularity,
-            };
-        });
-
-
-        console.log(apiData);
 
         apiDataLength = Object.keys(apiData).length
 
         let step = 1;
         let i = 0;
-
-
         while (i < apiDataLength) { 
             let cardLine = document.createElement("div");
             cardLine.className = "cardLine";
@@ -223,24 +233,12 @@ async function loadPreviewWindow(){
     }
     
     for (let k = cardLines.length - 1; k >= 0; k--) {
-
-        exWindow.appendChild(cardLines[k]);
+        cardsWindow.appendChild(cardLines[k]);
     }
     
+
+    exWindow.appendChild(cardsTypeSettings);
+    exWindow.appendChild(cardsWindow);
     container.appendChild(exWindow);
 
 }
-
-async function imageUrlToArrayBuffer(imageUrl) {
-    try {
-      const response = await fetch(imageUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const arrayBuffer = await response.arrayBuffer();
-      return arrayBuffer; // Return the ArrayBuffer directly
-    } catch (error) {
-      console.error("Error fetching image:", error);
-      return null;
-    }
-  }
