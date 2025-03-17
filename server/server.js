@@ -17,6 +17,9 @@ const PORT = 3000;
 
 app.get('/uploadImage', async (req, res) => {
     const imageUrl = req.query.url;
+    console.log("uploadImage called with URL:", imageUrl);
+    console.log("req.query: ", req.query);
+
 
     if(!imageUrl){
         return res.status(400).send('No image URL provided');
@@ -29,7 +32,7 @@ app.get('/uploadImage', async (req, res) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const arrayBuffer = await response.arrayBuffer();
-        return arrayBuffer; // Return the ArrayBuffer directly
+        res.send(Buffer.from(arrayBuffer, 'binary'));
       } catch (error) {
         console.error("Error fetching image:", error);
         return null;

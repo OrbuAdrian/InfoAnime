@@ -1,7 +1,12 @@
-async function searchMoe(files){
+async function searchTraceMoe(files){
 
     console.log("searchMoe called");
-    if (!files.length) return; 
+    if (!files || files.length === 0) {
+        console.error("No files provided.");
+        return null;
+    }
+    
+    if (!files) return; 
 
     let traceMoeData;
 
@@ -32,7 +37,9 @@ async function searchMoe(files){
 
 async function searchAnilist(query = null, variables = null) {
 
-    console.log("searchAnilist called");
+    console.log("searchAnilist called with:");
+    console.log("query: ", query); 
+    console.log("variables: ", variables);  
     let anilistData;
 
     
@@ -52,33 +59,49 @@ async function searchAnilist(query = null, variables = null) {
                             }
                             averageScore
                             popularity
+                            isAdult
                         }
                     }
                 }`;
     }else if (query === null && variables != null) {
-        query = `query($searchTerm: String, $searchType: MediaType, $sortType: [MediaSort]) {
-            Page(page: 1, perPage: 50) {
-                media(search: $searchTerm, type: $searchType, sort: $sortType) {
-                    id
-                    title {
-                        romaji
-                        english
-                        native
-                    }
-                    coverImage {
-                        large
-                    }
-                    averageScore
-                    popularity
-                }
-            }
-        }`;
 
-        
+        let searchType = variables.searchType || "ANIME";
+        let sortType = variables.sortType || "POPULARITY_DESC";
+
+        if (searchType !== "CHARACTER") {
+            query = `query($searchTerm: String, $searchType: MediaType, $sortType: [MediaSort]) {
+                Page(page: 1, perPage: 50) {
+                    media(search: $searchTerm, type: $searchType, sort: $sortType) {
+                        id
+                        title { romaji english native }
+                        coverImage { large }
+                        averageScore
+                        popularity
+                        isAdult
+                        siteUrl
+                    }
+                }
+            }`;
+        } else {
+            query = `query ($searchTerm: String) {
+                Page(page: 1, perPage: 50) {
+                    characters(search: $searchTerm) {
+                        id
+                        name {
+                            full
+                        }
+                        image {
+                            large
+                        }
+                    }
+                }
+            }`;
+        }
+
         variables = {
             searchTerm: variables.searchTerm,
-            searchType: variables.searchType === undefined ? "ANIME" : variables.searchType, 
-            sortType: variables.sortType === undefined ? "POPULARITY_DESC" : variables.sortType,
+            searchType: searchType,
+            sortType: sortType,
         };
         
     }
@@ -101,7 +124,6 @@ async function searchAnilist(query = null, variables = null) {
     await fetch(url, options)
         .then(handleResponse)
         .then(data => {
-                console.log(data);
                 anilistData = data;
             }
         )
@@ -247,27 +269,6 @@ async function getAnilistResponse() {
 
 }
 
-async function fetchImages(results, api = "traceMoe") {
-    console.log("fetchImages called");
-
-
-    if (api === "traceMoe") {
-        console.log("Using trace.moe API");
-        animeFilter = filterResultsByAnime(results);
-        //finalResults = filterResultsBySimilarity(animeFilter);
-        console.log(animeFilter);
-
-        //await appendImages(finalResults);
-    } else if (api === "anilist") {
-        console.log("Using Anilist API");
-        const finalResults = getAnilistResponse();
-        console.log(finalResults);
-
-        //await appendImages(finalResults);
-    }
-    
-}
-
 function handleResponse(response) {
     return response.json().then(function (json) {
         return response.ok ? json : Promise.reject(json);
@@ -283,46 +284,3 @@ function handleError(error) {
     console.error(error);
 }
 
-const search = document.getElementById('search');
-    search.addEventListener('keyup', function(event){
-        if (event.key === 'Enter') {
-            console.log(search.value);
-
-
-            var query = `
-            query ($search: String){
-                Page(page: 1, perPage: 10) {
-                    pageInfo { 
-                        total
-                        currentPage
-                        lastPage
-                        hasNextPage
-                        perPage
-                    }
-
-                    media(search: $search, type: ANIME) {
-                        id
-                        title{
-                            romaji
-                            english
-                            native
-                        }
-                        coverImage {
-                            large
-                            medium
-                        }
-                        bannerImage
-                    }
-                }
-            }`
-            ;
-
-            var variables = {
-                search: search.value,
-            }
-            ;
-
-
-            searchAnilist(query, variables);
-        }
-    });

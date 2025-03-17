@@ -40,13 +40,13 @@ function filterResultsBySimilarity(results, threshold = 0.85, minResults = 6) {
 
 async function downloadImageToBuffer(imageUrl) {
     console.log("downloadImageToBuffer called");
-
+    console.log(imageUrl);
 
     try {
         const response = await fetch(`http://localhost:3000/uploadImage?url=${encodeURIComponent(imageUrl)}`);
         if (!response.ok) throw new Error("Failed to fetch image");
 
-        
+        console.log(response);
         const blob = await response.blob();
     
         
