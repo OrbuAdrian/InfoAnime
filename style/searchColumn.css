@@ -1,9 +1,9 @@
 .searchColumn{
-    margin:0 2rem 0 2rem;
+    margin:0 0 0 2rem;
     width: var(--searchWindowWidth);
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 
@@ -27,4 +27,39 @@
     border: 1.5px solid rgba(255, 255, 255, 1);
     background-color: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.15);   
+}
+
+.queryTypeSelectorSection{
+    
+    height: 100%;
+    width: 60px;
+    background-color: rgba(255, 255, 255, 0.15);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    transition: all 0.2s ease-in-out;
+}
+
+.queryTypeSelectorSection:hover{
+    background-color: rgba(255, 255, 255, 0.3);
+    
+}
+
+.queryTypeSelector.active{
+    filter: invert(1);
+}
+
+.queryTypeSelector{
+    transition: all 0.5s ease-in-out;
+}
+
+.queryTypeSelector:hover{
+    cursor: pointer;
+}
+
+.cardsWindow{
+    height: 100%;
 }
