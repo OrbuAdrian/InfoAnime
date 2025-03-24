@@ -7,6 +7,20 @@
     justify-content: center;
     align-items: center;
 
+    transition: all 1.3s;
+}
+
+.searchColumn.cardSelected{
+    width: 0;
+    margin: 0;
+
+    transition: all 1.3s;
+}
+
+.searchColumn.cardSelected *{
+    transform: translateX(-100%); 
+    opacity: 0;
+    transition: transform 1.3s, opacity 1s;
 }
 
 .searchBar{
@@ -20,7 +34,7 @@
 
     background-color: rgba(var(--bg-color), 0.65);
     color: rgb(255, 255, 255);
-    transition: all 0.4s ease-in-out;
+    transition: all 0.3s ease-in;
 }
 
 .searchBar:hover{
@@ -40,7 +54,7 @@
     justify-content: space-around;
     align-items: center;
 
-    transition: all 0.2s ease-in-out;
+    transition: all 0.1s ease-in;
 }
 
 .queryTypeSelectorSection:hover{
@@ -53,7 +67,7 @@
 }
 
 .queryTypeSelector{
-    transition: all 0.5s ease-in-out;
+    transition: all 0.4s ease-in;
 }
 
 .queryTypeSelector:hover{

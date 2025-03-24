@@ -31,6 +31,13 @@
 
 .displayWindow{
   width: var(--examplesWindowWidth);
-
   display: flex;
+
+  background-color: black;
+
+  transition: all 1.3s;
+}
+
+.displayWindow.cardSelected{
+  width: 100%;
 }

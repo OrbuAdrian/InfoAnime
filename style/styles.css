@@ -9,7 +9,7 @@
     --cardLineHeight: 33.33%;
     --exampleCardAnimationDuration: 105s;
 
-    --examplesWindowWidth: 60%;
+    --examplesWindowWidth: 70%;
     --searchWindowWidth: calc(100% - var(--examplesWindowWidth));
     
 }
