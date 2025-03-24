@@ -1,0 +1,95 @@
+.card_Name {
+
+    position: absolute;
+    
+    top: 5rem;
+    left: 20%;
+
+    color: white;
+
+    z-index: 1;
+}
+
+.card_Age {
+
+    position: absolute;
+    
+    top: 45%;
+    left: 2rem;
+
+    color: white;
+
+    z-index: 1;
+}
+
+.card_Gender {
+
+    position: absolute;
+    
+    top: 50%;
+    left: 2rem;
+
+    color: white;
+
+    z-index: 1;
+}
+
+.card_DoB {
+
+    position: absolute;
+    
+    top: 55%;
+    left: 2rem;
+
+    color: white;
+
+    z-index: 1;
+}
+
+.card_Favourites {
+
+    position: absolute;
+    
+    top: 60%;
+    left: 2rem;
+
+    color: white;
+
+    z-index: 1;
+}
+
+.highlight{
+    display: none;
+}
+
+.card_CharDescription {
+
+    overflow: auto;
+    position: absolute;
+
+    top: 10rem;
+    left: 20%;
+    margin-right: 2rem;
+    padding: 1rem;
+
+    height: 350px;
+
+    color: white;
+    background-color: rgb(132, 132, 132);
+
+}
+
+.card_CharMedia {
+    overflow: auto;
+    position: absolute;
+
+    bottom: 2rem;
+    left: 20%;
+    margin-right: 2rem;
+    
+
+    height: 175px;
+    width: 76%;
+
+    background-color: rgba(154, 154, 154, 0.896);
+}

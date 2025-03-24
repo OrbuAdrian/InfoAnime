@@ -13,8 +13,6 @@ export function create_searchLabel(callback) {
     searchLabel.className = "searchBar";
     searchLabel.innerHTML = "Choose an image";
     searchLabel.addEventListener("click", () => {
-        console.log("searchLabel clicked");
-
 
         if (callback){
             

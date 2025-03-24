@@ -27,6 +27,11 @@ export function create_displayTypeSettings(searchInput, callback) {
         `
     }
     
+    cardsTypeSettings.addEventListener("click", async () => {
+        if (callback){
+            callback(false);
+        }
+    });
 
     cardsTypeSettings.querySelectorAll(".queryTypeSelector").forEach((element) => {
         if (element.id === window.appSettings.activeQueryType) {
@@ -42,7 +47,7 @@ export function create_displayTypeSettings(searchInput, callback) {
         
                 element.classList.add("active");
         
-                window.variables = {searchTerm: searchInput.value == "" ? null : searchInput.value, searchType: element.id}
+                window.variables = {searchTerm: searchInput.value == "" ? null : searchInput.value, searchType: element.id, searchID: null};
                 window.appSettings.activeQueryType = element.id;
 
                 if (element.id === "CHARACTER") {
@@ -57,7 +62,7 @@ export function create_displayTypeSettings(searchInput, callback) {
                 }
             } else {
 
-                window.variables = {searchTerm: null, searchType: null};
+                window.variables = {searchTerm: null, searchType: null, searchID: null};
                 window.appSettings.activeQueryType = "ANIME";
                 window.isCharacterData = false;
 
@@ -71,6 +76,8 @@ export function create_displayTypeSettings(searchInput, callback) {
            
         });
     });
+
+
 
     return cardsTypeSettings;
 

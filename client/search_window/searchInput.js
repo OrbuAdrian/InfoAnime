@@ -10,7 +10,7 @@ export function create_searchInput(callback) {
     searchInput.addEventListener("keyup", async (event) => {
         if (event.key === "Enter") {
 
-            window.variables = { searchTerm: searchInput.value, searchType: window.appSettings.activeQueryType };
+            window.variables = { searchTerm: searchInput.value, searchType: window.appSettings.activeQueryType , searchID: null };
             window.traceMoeBool = false;
             window.anilistBool = true;
 

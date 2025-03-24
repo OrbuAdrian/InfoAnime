@@ -6,7 +6,6 @@ export function create_searchWindow(){
     let searchWindow = document.createElement("div");
     searchWindow.className = "searchColumn";
 
-
     return searchWindow;
 }
 

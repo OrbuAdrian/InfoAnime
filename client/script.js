@@ -1,6 +1,5 @@
 async function searchTraceMoe(files){
 
-    console.log("searchMoe called");
     if (!files || files.length === 0) {
         console.error("No files provided.");
         return null;
@@ -25,89 +24,146 @@ async function searchTraceMoe(files){
         .then(handleResponse)
         .then(data => {
 
-                console.log(data);
+                console.log("Anilist response: ", data);
                 traceMoeData = data;
             }
         )
         .catch(handleError);
 
-    console.log("searchMoe finished");
     return traceMoeData;
 }
 
-async function searchAnilist(query = null, variables = null) {
+async function searchAnilist(query, variables) {
 
     console.log("searchAnilist called with:");
-    console.log("query: ", query); 
-    console.log("variables: ", variables);  
+
     let anilistData;
 
+    let queryID = `query($searchTerm: String, $searchType: MediaType, $sortType: [MediaSort]) {
+                        Page(page: 1, perPage: 50) {
+                            media(search: $searchTerm, type: $searchType, sort: $sortType) {
+                                id
+                                title {
+                                    english
+                                }
+                                coverImage {
+                                    large
+                                }
+                                isAdult
+                            }
+                        }
+                    }`;
     
+    let queryCharacterId = `query ($searchTerm: String, $sortType: [CharacterSort]) {
+                                Page(page: 1, perPage: 50) {
+                                    characters(search: $searchTerm, sort: $sortType) {
+                                        id
+                                        image {
+                                            large
+                                        }       
+                                    }
+                                }
+                            }`;
 
-    if (query === null && variables === null) {
-        query = `query {
-                    Page(page: 1, perPage: 50) {
-                        media(type: ANIME, sort: POPULARITY_DESC) {
-                            id
-                            title {
-                                romaji
-                                english
-                                native
+    let querySeries = `query($searchID: Int, $searchType: MediaType) {
+                            Media(id: $searchID, type: $searchType) {
+                                id
+                                title {
+                                    romaji
+                                    english
+                                    native
+                                }
+                                coverImage {
+                                    large
+                                }
+                                bannerImage
+                                description
+                                genres
+                                format
+                                status
+                                episodes
+                                duration
+                                averageScore
+                                popularity
+                                trending
+                                studios {
+                                    nodes {
+                                        name
+                                        siteUrl
+                                        isAnimationStudio
+
+                                    }
+                                }
+                                tags {
+                                    name
+                                }
+                                isAdult
                             }
-                            coverImage {
-                                large
+                        }`;
+
+    let queryCharacter = `query ($searchID: Int) {
+                            Character(id: $searchID) {
+                                id
+                                name {
+                                    full
+                                    native
+                                    alternative
+                                }
+                                image {
+                                    large
+                                }
+                                description
+                                gender
+                                dateOfBirth {
+                                    year
+                                    month
+                                    day
+                                }
+                                age
+                                favourites
+                                media {
+                                    nodes {
+                                        id
+                                        title {
+                                            romaji
+                                            english
+                                            native
+                                        }
+                                        coverImage {
+                                            large
+                                        }
+
+                                        averageScore
+                                        popularity
+                                        trending
+
+                                    }
+                                }
+                                siteUrl
                             }
-                            averageScore
-                            popularity
-                            isAdult
-                        }
-                    }
-                }`;
-    }else if (query === null && variables != null) {
+                        }`;
 
-        let searchType = variables.searchType || "ANIME";
-        let sortType = variables.sortType || "POPULARITY_DESC";
+                
 
-        if (searchType !== "CHARACTER") {
-            query = `query($searchTerm: String, $searchType: MediaType, $sortType: [MediaSort]) {
-                Page(page: 1, perPage: 50) {
-                    media(search: $searchTerm, type: $searchType, sort: $sortType) {
-                        id
-                        title { romaji english native }
-                        coverImage { large }
-                        averageScore
-                        popularity
-                        isAdult
-                        siteUrl
-                    }
-                }
-            }`;
-        } else {
-            query = `query ($searchTerm: String) {
-                Page(page: 1, perPage: 50) {
-                    characters(search: $searchTerm) {
-                        id
-                        name {
-                            full
-                        }
-                        image {
-                            large
-                        }
-                    }
-                }
-            }`;
-        }
+    
+    variables = {
+        searchTerm: variables?.searchTerm || null,
+        searchType: variables?.searchType || "ANIME",
+        sortType: variables?.sortType || variables?.searchType === "CHARACTER" ? ["FAVOURITES_DESC"] : ["POPULARITY_DESC"],
+        searchID: variables?.searchID || null
+    };
 
-        variables = {
-            searchTerm: variables.searchTerm,
-            searchType: searchType,
-            sortType: sortType,
-        };
-        
+    console.log("fetch type:", query);
+    console.log("variables:", variables.searchID);
+
+    switch (query) {
+        case "ID": query = queryID; break;
+        case "CHARACTER_ID": query = queryCharacterId; break;
+        case "CHARACTER": query = queryCharacter; break;
+        case "SERIES": query = querySeries; break;
+        default: query = queryAll; break;
     }
-
-
-
+    
     var url = 'https://graphql.anilist.co',
         options = {
             method: 'POST',
@@ -125,6 +181,8 @@ async function searchAnilist(query = null, variables = null) {
         .then(handleResponse)
         .then(data => {
                 anilistData = data;
+                console.log(data);
+                
             }
         )
         .catch(handleError);
@@ -134,140 +192,6 @@ async function searchAnilist(query = null, variables = null) {
     return anilistData;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-
-});
-
-async function getAnilistResponse() {
-    const queryCards = document.getElementsByClassName('responseCard');
-
-    for (let card of queryCards) {
-        card.addEventListener('click', () => {
-            console.log("Card clicked:", card.dataset.anilist);
-
-            var query = `
-            query ($id: Int){
-                Media(id: $id, type: ANIME) {
-                    title{
-                        romaji
-                        english
-                        native
-                    }
-                    synonyms 
-
-                    coverImage {
-                        large
-                    }
-
-                    bannerImage
-
-                    description
-
-                    format
-
-                    status
-
-                    startDate {
-                        year
-                        month
-                        day
-                    }
-
-                    endDate {
-                        year
-                        month
-                        day
-                    }
-
-                    season
-
-                    episodes
-    
-                    duration
-    
-                    genres
-    
-                    studios {
-                        nodes {
-                            name
-                            siteUrl
-                            isAnimationStudio
-
-                        }
-                        
-                    }
-
-                    averageScore
-
-                    popularity
-
-                    trending
-
-                    tags {
-                        name
-                    }
-
-
-
-                    characters{
-                        edges {
-                            role
-                            node {
-                                id
-                                name {
-                                    full
-                                }
-                                image {
-                                    large
-                                }
-                            }
-                        }
-                    }
-
-                    staff {
-                        edges {
-                            role
-                            node {
-                                name {
-                                    full
-                                }
-                                image {
-                                    large
-                                    medium    
-                                }
-                            }
-                        }
-                    }
-                }
-            }`
-            ;
-
-            var variables = {
-                id: `${card.dataset.anilist}`,
-                perPage: 50
-            };
-
-
-            var url = 'https://graphql.anilist.co',
-            options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    query: query,
-                    variables: variables
-                })
-            };
-
-            fetch(url, options).then(handleResponse)
-                .then(data => {return data})
-                .catch(handleError);
-        });
-    }
-
-}
 
 function handleResponse(response) {
     return response.json().then(function (json) {
